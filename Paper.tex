@@ -50,7 +50,7 @@
 \makeatother
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
+%\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -68,10 +68,12 @@
 \providecommand{\tightlist}{%
     \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifLuaTeX
-\usepackage{selnolig}  % disable illegal ligatures
-\fi
+
 \usepackage{stackengine}
+\usepackage{setspace}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm}
+
 
 \author{}
 \date{}
@@ -130,16 +132,17 @@
     \newpage
 
 
-    \input{introduction.tex}
+    \begin{spacing}{1.5}
+        \input{introduction.tex}
 
-    \input{model_architecture.tex}
+        \input{model_architecture.tex}
 
-    \input{experiments.tex}
+        \input{experiments.tex}
 
-    \input{conclusions.tex}
+        \input{conclusions.tex}
 
-
-    \bibliographystyle{IEEEbib}
-    \bibliography{reference}
+        \bibliographystyle{IEEEbib}
+        \bibliography{reference}
+    \end{spacing}
 
 \end{document}

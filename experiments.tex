@@ -31,10 +31,11 @@ The hidden units of LSTM in the target pitch extraction is set to 300. The windo
 \end{table}
 
 A target pitch extraction examples selected from the test set is shown in Figure~\ref{fig:pitch_1}.
-\begin{figure}[t]
-    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/pitch.eps}}{(a)}
-    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_mix.eps}}{(b)}
-    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_target.eps}}{(c)}
+\begin{figure}[!htbp]
+    \centering
+    \stackunder[5pt]{\includegraphics[width=0.45\linewidth]{img/pitch.eps}}{(a)}
+    \stackunder[5pt]{\includegraphics[width=0.45\linewidth]{img/spec_mix.eps}}{(b)}
+    \stackunder[5pt]{\includegraphics[width=0.45\linewidth]{img/spec_target.eps}}{(c)}
 
     \caption{Target pitch extraction result of 2506-11267-0005 item in the test set. (a) Estimated pitch compared with the ground-truth pitch; (b) and (c) Estimated and ground-truth pitch respectively represented on the magnitude spectrogram, only the low frequency part is showed. }
     \label{fig:pitch_1}

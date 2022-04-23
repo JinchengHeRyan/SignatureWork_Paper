@@ -19,7 +19,7 @@ The extracted target pitch, together with the speaker embedding, are concatenate
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.8\linewidth]{img/overall_architecture}
+    \includegraphics[width=0.6\linewidth]{img/overall_architecture}
     \caption{TSS model with pitch concatenation.}
     \label{fig:pitch_concatenate}
 \end{figure}
@@ -49,7 +49,7 @@ where ${N^{0.05}}$ denotes the number of frames in which the estimated pitch dev
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{img/tp_model}
+    \includegraphics[width=0.8\linewidth]{img/tp_model}
     \caption{Model structure of pitch extraction model.}
     \label{fig:tp_extraction}
 \end{figure}
@@ -74,14 +74,14 @@ And we choose scale-invariant source-to-noise ratio (SI-SNR) as our training tar
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{img/mbrnn_pitch}
+    \includegraphics[width=0.7\linewidth]{img/mbrnn_pitch}
     \caption{Model architecture of MBRNN model combining with target pitch information, the left side of the figure is the whole architecture of MBRNN with target pitch, the right side of the figure is the detail structure of Mag\_mask Net in the left side, for our experiments, we choose the number of RNN Blocks is 4.}
     \label{fig:mbrnn_pitch}
 \end{figure}
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.7\linewidth]{img/rnnBlock.png}
+    \includegraphics[width=0.6\linewidth]{img/rnnBlock.png}
     \caption{Detailed structure of RNN Block in MBRNN model.}
     \label{fig:rnnBlock}
 \end{figure}

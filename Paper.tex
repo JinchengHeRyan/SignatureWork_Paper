@@ -1,3 +1,5 @@
+%! Author = jincheng
+
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
@@ -121,234 +123,20 @@
 
 
     \section{ACKNOWLEDGEMENTS}\label{acknowledgements}
+    \newpage
 
 
     \tableofcontents
+    \newpage
 
 
-    \section{Introduction}
-    \label{sec:intro}
+    \input{introduction.tex}
 
-    Target speaker separation (TSS) has attracted much attention in recent years~\cite{speakerBeam, compact_speakerbeam, voicefilter, li20p_interspeech, time_domain_speaker_ex_net, spex, spex+, speakerfilter, speakerfilter_pro}.
-    It is the task which only extracts the speech of the target speaker in the environment with multiple people speaking simultaneously.
-    The general deep neural network based TSS framework could be summarized as an Encoder (including the speech and speaker encoder)-Separator-Decorder architecture, shown as Figure~\ref{fig:enc_sep_doc_arc}.
+    \input{model_architecture.tex}
 
-    The related works, such as VoiceFilter~\cite{voicefilter}, Atss-Net~\cite{li20p_interspeech}, spex++~\cite{time_domain_speaker_ex_net, spex, spex+}, made efforts in different parts of the aforementioned architecture. The Atss-Net introduced attention mechanisms in the separator. The spex++ adopted the time-domain method and made lots of changes in the speech and speaker encoder. All of them contribute a lot to the development of TSS task.
+    \input{experiments.tex}
 
-    Despite the great progress made, we are motivated to explore useful and robust training strategies that could be applied to different model architectures. For instance, use new feature as one of the inputs of separator.
-
-    Pitch, or fundamental frequency, is an important characteristic of speech and music signals.
-    The task of pitch extraction, or pitch tracking has a long history. There are multiple signal processing based methods to extract pitch. A time domain signal processing method is proposed in~\cite{yin} to estimate the foundamental frequency.
-    A frequency-domain signal processing method is proposed in~\cite{swipe}.
-
-    Before the usage of DNN methods for extracting pitch, there are some traditional signal processing methods, and although they have the advantage that the algorithms are easy to understand and do not require training data, they have limitations in terms of accuracy especially in complex environments.
-    Hence, many machine learning based algorithms were developed. A supervised machine learning based algorithm in the time domain is proposed in~\cite{crepe}.
-    A self-supervised machine learning based algorithm in the frequency domain is proposed in~\cite{spice}.
-
-    Using pitch information to help speech separation task also attracts a lot of attention in recent years.
-    A pitch extraction module is concatenated with the separation module together to perform the separation task in~\cite{pitch_aware}.
-    A serial model is built and the final loss is designed as a weighted sum of the speech separation loss and pitch loss in~\cite{serial}. However the serial model in~\cite{serial} needs to go through the target speaker extraction first and then perform the pitch tracking after the extraction.
-
-    \begin{figure}[!t]
-        \centering
-        \includegraphics[width=0.58\linewidth]{img/encoder_sep_decoder}
-        \caption{The Encoder-Separator-Decoder architecture}
-        \label{fig:enc_sep_doc_arc}
-    \end{figure}
-
-    In our paper, we propose a target speaker pitch extraction module which can directly estimate the target speaker's pitch from a mixture of utterances from multiple speakers.
-    Then we explore the strategies on how to contribute this target speaker's pitch information to the target speaker separation task.
-    We propose a small scale Multi-Block RNNoise (MBRNN) model (details in~\ref{subsec:mbrnn_model}) as our baseline speech separation system.
-    Then we propose two training strategies, namely concatenation training and joint training.
-    We further implement these two strategies on multiple models with different scales and the experiment results show that the joint training of the target pitch extraction model and the target speaker separation model is useful to improve the separation performance.
-    The proposed strategies could make positive impact on the TSS task even though the precision of the target pitch extraction is not high enough.
-    The performance of concatenation with ground-truth pitch information show great potential in utilizing the target speaker's pitch information for the TSS task.
-
-
-    \section{Model Architecture}
-    \label{sec:architecture}
-
-    In this section, we give a detailed description of our target pitch extraction module and the training strategies of incorporating pitch information in the speech separation model.
-    We have three modules in our framework: 1) the speaker embedding extraction module, which accepts the enrollment utterance and outputs the 128-dimensional speaker embedding the same way as in~\cite{li20p_interspeech}. 2) the target pitch extraction module, which accepts the magnitude spectrogram of the mixed utterance and the target speaker embedding, then outputs the 1-dimensional target pitch value; 3) the TSS module, which accepts the mixed utterance, the target speaker embedding, the target pitch information, then ouputs the estimated target speaker's voice.
-
-    \subsection{Training strategies with pitch}
-    \label{subsec:two_training_strategy}
-
-    \subsubsection{Concatenation}
-    \label{subsubsec:pitch_cat}
-    The architecture of the TSS model with simply pitch information concatenated is illustrated in Figure~\ref{fig:pitch_concatenate}.
-
-    The extracted target pitch, together with the speaker embedding, are concatenated with the audio feature along the feature axis and then fed into the speech separation model. In this concatenation strategy, the speaker embedding extraction module and the target pitch extraction module are all pre-trained well-performed models. Thus the parameters of both models are frozen in the speech separation stage.
-
-    \begin{figure}[t]
-        \centering
-        \includegraphics[width=0.8\linewidth]{img/overall_architecture}
-        \caption{TSS model with pitch concatenation.}
-        \label{fig:pitch_concatenate}
-    \end{figure}
-
-    \subsubsection{Joint training}
-    \label{subsubsec:pitch_joint}
-
-    The structure of joint training is as same as in section~\ref{subsubsec:pitch_cat}.
-    The difference is that the target pitch extraction model and the TSS model are optimized jointly. The experimental results of this strategy suggest better performance than the concatenation strategy.
-
-    \subsection{Target pitch extraction module}
-    \label{subsec:pitch_model}
-    Our target pitch extraction model is LSTM-based. The structure is shown in Figure~\ref{fig:tp_extraction}.
-    The model takes in the spectrogram of the mixed utterance and the target speaker embedding, and outputs the 1-dimensional pitch information $f_0\in\mathbb{R}^{T\times 1}$ of the target speaker, where $T$ is the number of frames of the mixed utterance.
-    The ground-truth pitch information is extracted using the RAPT algorithm~\cite{Talkin2005ARA} on the pre-mix clean signal, the pitch range is set to $60\sim404$ Hz.
-    We see this target pitch extraction work as a regression problem and adopt L1 loss as the loss function:
-    \begin{equation}
-        L = min|\hat{f}_{0}-f_{0}|
-    \end{equation}
-    where $\hat{f}_{0}$, $f_{0}$ denote the estimated and the ground-truth pitch respectively.
-
-    We employ the precision rate (PR) to evaluate the pitch extraction result~\cite{zhang16d_interspeech}, which is defined as follow:
-    \begin{equation}
-        PR =\frac{N^{0.05}}{N}
-    \end{equation}
-    where ${N^{0.05}}$ denotes the number of frames in which the estimated pitch deviates less than $5\%$ from the ground-truth pitch, and $N$ denotes the total frames of mixed utterance.
-
-    \begin{figure}[t]
-        \centering
-        \includegraphics[width=\linewidth]{img/tp_model}
-        \caption{Model structure of pitch extraction model.}
-        \label{fig:tp_extraction}
-    \end{figure}
-
-    \subsection{MBRNN}
-    \label{subsec:mbrnn_model}
-    Our proposed small scale separation model, named as Multi-Block RNNoise (MBRNN), is modified from the well-known RNNoise~\cite{rnnoise} model in speech enhancement.
-    The architecture of MBRNN model is shown in Figure~\ref{fig:mbrnn_pitch}. Each RNNblock in MBRNN includes a fully-connected (FC) layer and a RNNoise-like module (shown in Figure~\ref{fig:rnnBlock}).
-    After the concatenation between speaker embedding and the magnitude spectrogram, the FC layer is used to compress the feature dimension into a fixed smaller scope.
-    The RNNblock is repeated for 4 times to improve the representational capacity.
-    In order to ease the training problem of deep neural network, a cumulative layer normalizaton (cLN)~\cite{conv_tasnet} is adopted between RNNoise blocks.
-
-    We use a Conv1D layer to accelerate the computation of STFT.
-    As the regular time-frequency domain method, only the magnitude spectrogram of the mixed uttenrace $X\in\mathbb{R}^{T\times F}$ is fed into the following network, the phase spectrogram $P\in\mathbb{R}^{T\times F}$ is used to reconstruct the estimated target signal at the end, where $T$ denotes the number of frames and $F$ denotes the spectrogram bin axis.
-    The estimated magnitude spectrogram is the element-wise product between the mixed spectrogram and the estimated mask $M\in\mathbb{R}^{T\times F}$. The estimated magnitude spectrogram and the mixed phase spectrogram $P$ are fed into a Conv-Trans1D to perform inverse short-time Fourier transform (iSTFT) to get the estimated target speech.
-    It can be expressed as equation~\ref{eq:est_wav_eq}:
-    \begin{equation}
-        \label{eq:est_wav_eq}
-        \hat{s} = \text{Conv\_iSTFT}\left( \text{ReLU}\left( M\odot X \right), P \right)
-    \end{equation}
-    And we choose scale-invariant source-to-noise ratio (SI-SNR) as our training target~\cite{tasnet}.
-
-    \begin{figure}[t]
-        \centering
-        \includegraphics[width=\linewidth]{img/mbrnn_pitch}
-        \caption{Model architecture of MBRNN model combining with target pitch information, the left side of the figure is the whole architecture of MBRNN with target pitch, the right side of the figure is the detail structure of Mag\_mask Net in the left side, for our experiments, we choose the number of RNN Blocks is 4.}
-        \label{fig:mbrnn_pitch}
-    \end{figure}
-
-    \begin{figure}[t]
-        \centering
-        \includegraphics[width=0.7\linewidth]{img/rnnBlock.png}
-        \caption{Detailed structure of RNN Block in MBRNN model.}
-        \label{fig:rnnBlock}
-    \end{figure}
-
-
-    \section{Experiments}
-    \label{sec:exp_result}
-
-    \subsection{Dataset description}
-    \label{subsec:dataset}
-
-    Our experiments are conducted on the LibriSpeech dataset, and we use the same training and testing tuple as same as Google used in VoiceFilter~\cite{voicefilter}. The mixed utterances are all truncated to 5 seconds in the training stage. We mix the utterances to 0dB in SNR.
-
-    \subsection{Target pitch training}
-    \label{subsec:target_pitch_training}
-
-    The hidden units of LSTM in the target pitch extraction is set to 300. The window length and hop size are 25ms and 10ms as same as the speech separation model used. And we perform a 512-point STFT on the mixed utterance. To evaluate the pitch extraction ability of our model, we also trained a clean pitch extractor on single speaker clean data. The PR result is shown in Table~\ref{tab:pitch result}.
-
-    \begin{table}[htbp]
-        \centering
-        \begin{tabular}{c|c}
-            \toprule
-            Type                                          & PR($\%$) \\
-            \midrule
-            Single speaker pitch extraction on clean data & 93.06    \\
-            \midrule
-            Target pitch extractor on mixture data        & 70.27    \\
-            \bottomrule
-        \end{tabular}
-        \caption{PR results of different type of pitch extraction models.}
-        \label{tab:pitch result}
-    \end{table}
-
-    A target pitch extraction examples selected from the test set is shown in Figure~\ref{fig:pitch_1}.
-    \begin{figure}[t]
-        \stackunder[5pt]{\includegraphics[width=\linewidth]{img/pitch.eps}}{(a)}
-        \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_mix.eps}}{(b)}
-        \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_target.eps}}{(c)}
-
-        \caption{Target pitch extraction result of 2506-11267-0005 item in the test set. (a) Estimated pitch compared with the ground-truth pitch; (b) and (c) Estimated and ground-truth pitch respectively represented on the magnitude spectrogram, only the low frequency part is showed. }
-        \label{fig:pitch_1}
-    \end{figure}
-
-    \begin{table*}[!htbp]
-        \centering
-        \begin{tabular}{l|c|c|c|c}
-            \toprule
-            & \multicolumn{4}{c}{Mean SDR} \\
-            Model (strategy)                             & \#PARAM TSS(TPE) & Before & After         & Improvement   \\
-            \midrule
-            MBRNN (Baseline)                             & 0.60M            & 1.26   & 6.09          & 4.83          \\
-            MBRNN Pitch (Concatenation)                  & 0.60M(1.46M)     & 1.26   & 6.28          & 5.02          \\
-            MBRNN Pitch (Joint train)                    & 0.60M(1.46M)     & 1.26   & \textbf{7.11} & \textbf{5.85} \\
-            MBRNN Pitch (Ground truth pitch)             & 0.60M            & 1.26   & 9.80          & 8.54          \\
-            \midrule
-            Our implementation of VoiceFilter (Baseline) & 15.52M           & 1.26   & 9.02          & 7.76          \\
-            Our implementation of VoiceFilter Pitch (Joint train) & 15.53M(1.46M) & 1.26 & \textbf{9.20}
-            & \textbf{7.94}
-            \\
-            \midrule
-            VoiceFilter~\cite{voicefilter} (Baseline)    & 9.45M            & 1.26   & 9.04          & 7.78          \\
-            VoiceFilter~\cite{voicefilter} Pitch (Joint train) & 9.46M(1.46M) & 1.26 & \textbf{9.60}
-            & \textbf{8.34}
-            \\
-            \bottomrule
-        \end{tabular}
-        \caption{Results comparison between different training strategies and the baseline with MBRNN and VoiceFilter model. ``Before" means the SDR value of the mixed utterance, ``After" means the SDR value of the estimated speech.}
-        \label{tab:mbrnn_comparison}
-    \end{table*}
-
-    \subsection{Implementation details}
-    \label{subsec:implement}
-
-    Our experiments are done using PyTorch~\cite{NEURIPS2019_bdbca288}.
-    In Table~\ref{tab:mbrnn_comparison}, TSS and target pitch extraction (TPE) mean the number of model parameters of speech separation model and target pitch extraction model respectively.
-    MBRNN (Baseline) means the baseline MBRNN model which does not use target pitch information. MBRNN Pitch (Concatenation) and MBRNN Pitch (Joint train) mean the MBRNN model uses target pitch information with the training strategy in Section~\ref{subsubsec:pitch_cat} and Section~\ref{subsubsec:pitch_joint} respectively.
-
-    We also validate our proposed methods on the well known VoiceFilter baseline model which has larger scale compared to our MBRNN model. For the VoiceFilter model, we use MSE loss instead of SI-SNR loss for all experiments for keeping the same setup as the original one. However for the faster training time, we change the channels to 16 in CNNs for those which are originally 64 and 8 in VoiceFilter. The re-implementation in~\cite{li20p_interspeech} of VoiceFilter is 9.04, the re-implementation of VoiceFilter here is 9.02.
-    Both separation models and target pitch extraction model, we did 512-point STFT on the utterance, the window length is 25ms and the hop length is 10ms. The frequency dimension of the spectrogram is 257 and the embedding dimension is 128.
-
-    In the target pitch extraction module, the first fully connected layer (FC 1) maps the vector from frequency dimension (257) into embedding dimension (128). Then concatenate with the embedding, so the input dimension into LSTM is $2\times \text{embedding\_dim}$. In LSTM, the hidden dimension is 300, number of recurrent layers is 2, set dropout as 0.3. For FC 2, it maps the dimension from 300 to 128, a ReLU activation is added after FC 2. FC 3 maps the dimension from 128 to 1 and set ReLU activation after FC 3.
-
-    In RNN Block in MBRNN model, FC 1 maps from $\text{embedding\_dim}$ to $\text{embedding\_dim} - 1$. Before FC 2, concatenate the three inputs. FC 2 maps from $\text{hidden\_dim}\times\text{amp} + \text{embedding\_dim}$ to $\text{rnn\_units}\times\text{amp}$, $\text{amp}$ and $\text{rnn\_units}$ are set to 1 and 38 respectively in our experiments. FC 3 maps to 24. For LSTM 1 - 3, the hidden sizes are 24, 48, 96 respectively. FC 4 maps dimension to 64. The output of each RNN Block is the sum of the output from FC 4 and the output feature from the last layer before RNN Block.
-
-    All the experiments use Adam optimizer~\cite{kingma2017adam} and $10^{-4}$ as initial learning rate.
-    For the experiments which choose MBRNN as the baseline, their batch size are 128, and for VoiceFilter, their batch size are 64.
-
-    \subsection{Results discussion}
-    \label{subsec:results_discussion}
-
-    From Table~\ref{tab:mbrnn_comparison}, due to the small model size of MBRNN, the baseline of MBRNN is a little bit weak. But from the results of both MBRNN and VoiceFilter we can see that target pitch information can help TSS model no matter in small model and large model.
-    For the concatenation training strategy in MBRNN, it can improve 5.02 dB compared to 4.83 dB in the baseline, and the joint training strategy can improve 5.85 dB. So joint training strategy is 0.83 dB higher than the concatenation strategy.
-    To validate the idea that the target pitch information is indeed useful for TSS model, we use the ground truth target pitch and found out it can help MBRNN reach 8.54dB improvement which is very significant, 2.69dB higher compared to the joint training strategy.
-    We can see that a high PR target pitch extraction can really help the TSS model, even without high precision target pitch extraction, by using the joint training strategy, it can still help the TSS model improve the performance.
-
-    Moreover, from the experiments done on the VoiceFilter baseline, we can show that the joint training strategy on TSS model and pre-trained target pitch extraction model is a robust strategy to help TSS model improve the performance.
-    And our experiments showed that even though the precision of target pitch extraction is not very high, the joint training strategy is better than simply concatenating pitch.
-
-    For the future works, we will continue to work on using target pitch on the time-domain model.
-
-
-    \section{Conclusions}
-    \label{sec:conclusions}
-    In this paper, we propose the idea that using target speaker's pitch as an auxiliary feature to improve the performance of target speaker separation. A target pitch extraction model is built and the target pitch information is incorporated with the TSS models in both simply concatenation and joint training strategies. We found that the target pitch information could improve the separation performance even though the pitch precision is not high enough yet. While the performance of concatenation with ground-truth pitch information show the great potency of this approach. The joint training approach yields better performance than simple concatenation. We also explore if joint training would bring improvement to the target pitch extraction, the result shows no obvious help. In the future work, we will continue to improve the precision of target pitch extraction and do more experiments on large scale models to validate the proposed methods.
+    \input{conclusions.tex}
 
 
     \bibliographystyle{IEEEbib}

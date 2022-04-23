@@ -1,0 +1,88 @@
+%! Author = jincheng
+%! Date = 2022/4/23
+
+
+\section{Model Architecture}
+\label{sec:architecture}
+
+In this section, we give a detailed description of our target pitch extraction module and the training strategies of incorporating pitch information in the speech separation model.
+We have three modules in our framework: 1) the speaker embedding extraction module, which accepts the enrollment utterance and outputs the 128-dimensional speaker embedding the same way as in~\cite{li20p_interspeech}. 2) the target pitch extraction module, which accepts the magnitude spectrogram of the mixed utterance and the target speaker embedding, then outputs the 1-dimensional target pitch value; 3) the TSS module, which accepts the mixed utterance, the target speaker embedding, the target pitch information, then ouputs the estimated target speaker's voice.
+
+\subsection{Training strategies with pitch}
+\label{subsec:two_training_strategy}
+
+\subsubsection{Concatenation}
+\label{subsubsec:pitch_cat}
+The architecture of the TSS model with simply pitch information concatenated is illustrated in Figure~\ref{fig:pitch_concatenate}.
+
+The extracted target pitch, together with the speaker embedding, are concatenated with the audio feature along the feature axis and then fed into the speech separation model. In this concatenation strategy, the speaker embedding extraction module and the target pitch extraction module are all pre-trained well-performed models. Thus the parameters of both models are frozen in the speech separation stage.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/overall_architecture}
+    \caption{TSS model with pitch concatenation.}
+    \label{fig:pitch_concatenate}
+\end{figure}
+
+\subsubsection{Joint training}
+\label{subsubsec:pitch_joint}
+
+The structure of joint training is as same as in section~\ref{subsubsec:pitch_cat}.
+The difference is that the target pitch extraction model and the TSS model are optimized jointly. The experimental results of this strategy suggest better performance than the concatenation strategy.
+
+\subsection{Target pitch extraction module}
+\label{subsec:pitch_model}
+Our target pitch extraction model is LSTM-based. The structure is shown in Figure~\ref{fig:tp_extraction}.
+The model takes in the spectrogram of the mixed utterance and the target speaker embedding, and outputs the 1-dimensional pitch information $f_0\in\mathbb{R}^{T\times 1}$ of the target speaker, where $T$ is the number of frames of the mixed utterance.
+The ground-truth pitch information is extracted using the RAPT algorithm~\cite{Talkin2005ARA} on the pre-mix clean signal, the pitch range is set to $60\sim404$ Hz.
+We see this target pitch extraction work as a regression problem and adopt L1 loss as the loss function:
+\begin{equation}
+    L = min|\hat{f}_{0}-f_{0}|
+\end{equation}
+where $\hat{f}_{0}$, $f_{0}$ denote the estimated and the ground-truth pitch respectively.
+
+We employ the precision rate (PR) to evaluate the pitch extraction result~\cite{zhang16d_interspeech}, which is defined as follow:
+\begin{equation}
+    PR =\frac{N^{0.05}}{N}
+\end{equation}
+where ${N^{0.05}}$ denotes the number of frames in which the estimated pitch deviates less than $5\%$ from the ground-truth pitch, and $N$ denotes the total frames of mixed utterance.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{img/tp_model}
+    \caption{Model structure of pitch extraction model.}
+    \label{fig:tp_extraction}
+\end{figure}
+
+\subsection{MBRNN}
+\label{subsec:mbrnn_model}
+Our proposed small scale separation model, named as Multi-Block RNNoise (MBRNN), is modified from the well-known RNNoise~\cite{rnnoise} model in speech enhancement.
+The architecture of MBRNN model is shown in Figure~\ref{fig:mbrnn_pitch}. Each RNNblock in MBRNN includes a fully-connected (FC) layer and a RNNoise-like module (shown in Figure~\ref{fig:rnnBlock}).
+After the concatenation between speaker embedding and the magnitude spectrogram, the FC layer is used to compress the feature dimension into a fixed smaller scope.
+The RNNblock is repeated for 4 times to improve the representational capacity.
+In order to ease the training problem of deep neural network, a cumulative layer normalizaton (cLN)~\cite{conv_tasnet} is adopted between RNNoise blocks.
+
+We use a Conv1D layer to accelerate the computation of STFT.
+As the regular time-frequency domain method, only the magnitude spectrogram of the mixed uttenrace $X\in\mathbb{R}^{T\times F}$ is fed into the following network, the phase spectrogram $P\in\mathbb{R}^{T\times F}$ is used to reconstruct the estimated target signal at the end, where $T$ denotes the number of frames and $F$ denotes the spectrogram bin axis.
+The estimated magnitude spectrogram is the element-wise product between the mixed spectrogram and the estimated mask $M\in\mathbb{R}^{T\times F}$. The estimated magnitude spectrogram and the mixed phase spectrogram $P$ are fed into a Conv-Trans1D to perform inverse short-time Fourier transform (iSTFT) to get the estimated target speech.
+It can be expressed as equation~\ref{eq:est_wav_eq}:
+\begin{equation}
+    \label{eq:est_wav_eq}
+    \hat{s} = \text{Conv\_iSTFT}\left( \text{ReLU}\left( M\odot X \right), P \right)
+\end{equation}
+And we choose scale-invariant source-to-noise ratio (SI-SNR) as our training target~\cite{tasnet}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{img/mbrnn_pitch}
+    \caption{Model architecture of MBRNN model combining with target pitch information, the left side of the figure is the whole architecture of MBRNN with target pitch, the right side of the figure is the detail structure of Mag\_mask Net in the left side, for our experiments, we choose the number of RNN Blocks is 4.}
+    \label{fig:mbrnn_pitch}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/rnnBlock.png}
+    \caption{Detailed structure of RNN Block in MBRNN model.}
+    \label{fig:rnnBlock}
+\end{figure}
+

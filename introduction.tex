@@ -1,0 +1,42 @@
+%! Author = jincheng
+%! Date = 2022/4/23
+
+
+\section{Introduction}
+\label{sec:intro}
+
+Target speaker separation (TSS) has attracted much attention in recent years~\cite{speakerBeam, compact_speakerbeam, voicefilter, li20p_interspeech, time_domain_speaker_ex_net, spex, spex+, speakerfilter, speakerfilter_pro}.
+It is the task which only extracts the speech of the target speaker in the environment with multiple people speaking simultaneously.
+The general deep neural network based TSS framework could be summarized as an Encoder (including the speech and speaker encoder)-Separator-Decorder architecture, shown as Figure~\ref{fig:enc_sep_doc_arc}.
+
+The related works, such as VoiceFilter~\cite{voicefilter}, Atss-Net~\cite{li20p_interspeech}, spex++~\cite{time_domain_speaker_ex_net, spex, spex+}, made efforts in different parts of the aforementioned architecture. The Atss-Net introduced attention mechanisms in the separator. The spex++ adopted the time-domain method and made lots of changes in the speech and speaker encoder. All of them contribute a lot to the development of TSS task.
+
+Despite the great progress made, we are motivated to explore useful and robust training strategies that could be applied to different model architectures. For instance, use new feature as one of the inputs of separator.
+
+Pitch, or fundamental frequency, is an important characteristic of speech and music signals.
+The task of pitch extraction, or pitch tracking has a long history. There are multiple signal processing based methods to extract pitch. A time domain signal processing method is proposed in~\cite{yin} to estimate the foundamental frequency.
+A frequency-domain signal processing method is proposed in~\cite{swipe}.
+
+Before the usage of DNN methods for extracting pitch, there are some traditional signal processing methods, and although they have the advantage that the algorithms are easy to understand and do not require training data, they have limitations in terms of accuracy especially in complex environments.
+Hence, many machine learning based algorithms were developed. A supervised machine learning based algorithm in the time domain is proposed in~\cite{crepe}.
+A self-supervised machine learning based algorithm in the frequency domain is proposed in~\cite{spice}.
+
+Using pitch information to help speech separation task also attracts a lot of attention in recent years.
+A pitch extraction module is concatenated with the separation module together to perform the separation task in~\cite{pitch_aware}.
+A serial model is built and the final loss is designed as a weighted sum of the speech separation loss and pitch loss in~\cite{serial}. However the serial model in~\cite{serial} needs to go through the target speaker extraction first and then perform the pitch tracking after the extraction.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.58\linewidth]{img/encoder_sep_decoder}
+    \caption{The Encoder-Separator-Decoder architecture}
+    \label{fig:enc_sep_doc_arc}
+\end{figure}
+
+In our paper, we propose a target speaker pitch extraction module which can directly estimate the target speaker's pitch from a mixture of utterances from multiple speakers.
+Then we explore the strategies on how to contribute this target speaker's pitch information to the target speaker separation task.
+We propose a small scale Multi-Block RNNoise (MBRNN) model (details in~\ref{subsec:mbrnn_model}) as our baseline speech separation system.
+Then we propose two training strategies, namely concatenation training and joint training.
+We further implement these two strategies on multiple models with different scales and the experiment results show that the joint training of the target pitch extraction model and the target speaker separation model is useful to improve the separation performance.
+The proposed strategies could make positive impact on the TSS task even though the precision of the target pitch extraction is not high enough.
+The performance of concatenation with ground-truth pitch information show great potential in utilizing the target speaker's pitch information for the TSS task.
+

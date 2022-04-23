@@ -1,0 +1,99 @@
+%! Author = jincheng
+%! Date = 2022/4/23
+
+
+\section{Experiments}
+\label{sec:exp_result}
+
+\subsection{Dataset description}
+\label{subsec:dataset}
+
+Our experiments are conducted on the LibriSpeech dataset, and we use the same training and testing tuple as same as Google used in VoiceFilter~\cite{voicefilter}. The mixed utterances are all truncated to 5 seconds in the training stage. We mix the utterances to 0dB in SNR.
+
+\subsection{Target pitch training}
+\label{subsec:target_pitch_training}
+
+The hidden units of LSTM in the target pitch extraction is set to 300. The window length and hop size are 25ms and 10ms as same as the speech separation model used. And we perform a 512-point STFT on the mixed utterance. To evaluate the pitch extraction ability of our model, we also trained a clean pitch extractor on single speaker clean data. The PR result is shown in Table~\ref{tab:pitch result}.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{c|c}
+        \toprule
+        Type                                          & PR($\%$) \\
+        \midrule
+        Single speaker pitch extraction on clean data & 93.06    \\
+        \midrule
+        Target pitch extractor on mixture data        & 70.27    \\
+        \bottomrule
+    \end{tabular}
+    \caption{PR results of different type of pitch extraction models.}
+    \label{tab:pitch result}
+\end{table}
+
+A target pitch extraction examples selected from the test set is shown in Figure~\ref{fig:pitch_1}.
+\begin{figure}[t]
+    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/pitch.eps}}{(a)}
+    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_mix.eps}}{(b)}
+    \stackunder[5pt]{\includegraphics[width=\linewidth]{img/spec_target.eps}}{(c)}
+
+    \caption{Target pitch extraction result of 2506-11267-0005 item in the test set. (a) Estimated pitch compared with the ground-truth pitch; (b) and (c) Estimated and ground-truth pitch respectively represented on the magnitude spectrogram, only the low frequency part is showed. }
+    \label{fig:pitch_1}
+\end{figure}
+
+\begin{table*}[!htbp]
+    \centering
+    \begin{tabular}{l|c|c|c|c}
+        \toprule
+        & \multicolumn{4}{c}{Mean SDR} \\
+        Model (strategy)                             & \#PARAM TSS(TPE) & Before & After         & Improvement   \\
+        \midrule
+        MBRNN (Baseline)                             & 0.60M            & 1.26   & 6.09          & 4.83          \\
+        MBRNN Pitch (Concatenation)                  & 0.60M(1.46M)     & 1.26   & 6.28          & 5.02          \\
+        MBRNN Pitch (Joint train)                    & 0.60M(1.46M)     & 1.26   & \textbf{7.11} & \textbf{5.85} \\
+        MBRNN Pitch (Ground truth pitch)             & 0.60M            & 1.26   & 9.80          & 8.54          \\
+        \midrule
+        Our implementation of VoiceFilter (Baseline) & 15.52M           & 1.26   & 9.02          & 7.76          \\
+        Our implementation of VoiceFilter Pitch (Joint train) & 15.53M(1.46M) & 1.26 & \textbf{9.20}
+        & \textbf{7.94}
+        \\
+        \midrule
+        VoiceFilter~\cite{voicefilter} (Baseline)    & 9.45M            & 1.26   & 9.04          & 7.78          \\
+        VoiceFilter~\cite{voicefilter} Pitch (Joint train) & 9.46M(1.46M) & 1.26 & \textbf{9.60}
+        & \textbf{8.34}
+        \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results comparison between different training strategies and the baseline with MBRNN and VoiceFilter model. ``Before" means the SDR value of the mixed utterance, ``After" means the SDR value of the estimated speech.}
+    \label{tab:mbrnn_comparison}
+\end{table*}
+
+\subsection{Implementation details}
+\label{subsec:implement}
+
+Our experiments are done using PyTorch~\cite{NEURIPS2019_bdbca288}.
+In Table~\ref{tab:mbrnn_comparison}, TSS and target pitch extraction (TPE) mean the number of model parameters of speech separation model and target pitch extraction model respectively.
+MBRNN (Baseline) means the baseline MBRNN model which does not use target pitch information. MBRNN Pitch (Concatenation) and MBRNN Pitch (Joint train) mean the MBRNN model uses target pitch information with the training strategy in Section~\ref{subsubsec:pitch_cat} and Section~\ref{subsubsec:pitch_joint} respectively.
+
+We also validate our proposed methods on the well known VoiceFilter baseline model which has larger scale compared to our MBRNN model. For the VoiceFilter model, we use MSE loss instead of SI-SNR loss for all experiments for keeping the same setup as the original one. However for the faster training time, we change the channels to 16 in CNNs for those which are originally 64 and 8 in VoiceFilter. The re-implementation in~\cite{li20p_interspeech} of VoiceFilter is 9.04, the re-implementation of VoiceFilter here is 9.02.
+Both separation models and target pitch extraction model, we did 512-point STFT on the utterance, the window length is 25ms and the hop length is 10ms. The frequency dimension of the spectrogram is 257 and the embedding dimension is 128.
+
+In the target pitch extraction module, the first fully connected layer (FC 1) maps the vector from frequency dimension (257) into embedding dimension (128). Then concatenate with the embedding, so the input dimension into LSTM is $2\times \text{embedding\_dim}$. In LSTM, the hidden dimension is 300, number of recurrent layers is 2, set dropout as 0.3. For FC 2, it maps the dimension from 300 to 128, a ReLU activation is added after FC 2. FC 3 maps the dimension from 128 to 1 and set ReLU activation after FC 3.
+
+In RNN Block in MBRNN model, FC 1 maps from $\text{embedding\_dim}$ to $\text{embedding\_dim} - 1$. Before FC 2, concatenate the three inputs. FC 2 maps from $\text{hidden\_dim}\times\text{amp} + \text{embedding\_dim}$ to $\text{rnn\_units}\times\text{amp}$, $\text{amp}$ and $\text{rnn\_units}$ are set to 1 and 38 respectively in our experiments. FC 3 maps to 24. For LSTM 1 - 3, the hidden sizes are 24, 48, 96 respectively. FC 4 maps dimension to 64. The output of each RNN Block is the sum of the output from FC 4 and the output feature from the last layer before RNN Block.
+
+All the experiments use Adam optimizer~\cite{kingma2017adam} and $10^{-4}$ as initial learning rate.
+For the experiments which choose MBRNN as the baseline, their batch size are 128, and for VoiceFilter, their batch size are 64.
+
+\subsection{Results discussion}
+\label{subsec:results_discussion}
+
+From Table~\ref{tab:mbrnn_comparison}, due to the small model size of MBRNN, the baseline of MBRNN is a little bit weak. But from the results of both MBRNN and VoiceFilter we can see that target pitch information can help TSS model no matter in small model and large model.
+For the concatenation training strategy in MBRNN, it can improve 5.02 dB compared to 4.83 dB in the baseline, and the joint training strategy can improve 5.85 dB. So joint training strategy is 0.83 dB higher than the concatenation strategy.
+To validate the idea that the target pitch information is indeed useful for TSS model, we use the ground truth target pitch and found out it can help MBRNN reach 8.54dB improvement which is very significant, 2.69dB higher compared to the joint training strategy.
+We can see that a high PR target pitch extraction can really help the TSS model, even without high precision target pitch extraction, by using the joint training strategy, it can still help the TSS model improve the performance.
+
+Moreover, from the experiments done on the VoiceFilter baseline, we can show that the joint training strategy on TSS model and pre-trained target pitch extraction model is a robust strategy to help TSS model improve the performance.
+And our experiments showed that even though the precision of target pitch extraction is not very high, the joint training strategy is better than simply concatenating pitch.
+
+For the future works, we will continue to work on using target pitch on the time-domain model.
+

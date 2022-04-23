@@ -72,6 +72,7 @@
 \usepackage{stackengine}
 \usepackage{setspace}
 \usepackage{geometry}
+\usepackage{CJKutf8}
 \geometry{left=2.5cm,right=2.5cm}
 
 
@@ -111,17 +112,23 @@
 
     \textbf{ABSTRACT} \emph{(in English)}
 
-    \emph{150 -- 200 words}. \emph{An abstract is a brief statement of the
-    problem or the purpose of the research. It should indicate the
-    theoretical work or experimental plan used, summarize principal findings
-    of the research, and point out major conclusions. Appropriate safety
-    information should be included when applicable. This should be the
-    section you write last to be sure that it accurately reflects the
-    content of the document.}
+    Despite the great progress achieved in the target speaker separation (TSS) task, we are still trying to find other robust ways for performance improvement which are independent of the model architecture and the training loss.
+    Pitch extraction plays an important role in many applications such as speech enhancement and speech separation.
+    It is also a challenging task when there are multiple speakers in the same utterance.
+    In this paper, we explore if the target speaker pitch extraction is possible and how the extracted target pitch could help to improve the TSS performance.
+    A target pitch extraction model is built and incorporated into different TSS models using two different strategies, namely concatenation and joint training.
+    The experimental results on the LibriSpeech dataset show that both training strategies could bring significant improvements to the TSS task, even the precision of the target pitch extraction module is not high enough.
 
     \textbf{ABSTRACT} \emph{(in Chinese)}
 
-    150 - 200
+    \begin{CJK}{UTF8}{gbsn}
+        尽管在目标说话人分离 (TSS) 任务中取得了巨大进展，但我们仍在尝试寻找其他独立于模型架构和训练损失的稳健方法来提高性能。
+        音高提取在语音增强和语音分离等许多应用中发挥着重要作用。
+        当同一话语中有多个说话者时，这也是一项具有挑战性的任务。
+        在本文中，我们探讨了目标说话人音高提取是否可行，以及提取的目标音高如何有助于提高 TSS 性能。
+        使用两种不同的策略，即连接和联合训练，构建目标基音提取模型并将其合并到不同的 TSS 模型中。
+        在 LibriSpeech 数据集上的实验结果表明，这两种训练策略都可以为 TSS 任务带来显着的改进，即使目标音高提取模块的精度不够高。
+    \end{CJK}
 
 
     \section{ACKNOWLEDGEMENTS}\label{acknowledgements}

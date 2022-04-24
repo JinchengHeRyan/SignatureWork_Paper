@@ -15,3 +15,19 @@ So the mixed utterance $U$ is as equation~\ref{eq:mixed}.
 \end{equation}
 For the mission of Target Speaker Separation (TSS) Task. Assume we only need to extract the voice of speaker $s_n$ and we have the reference utterance from $s_n$, denoted as $R_n$.
 The task is given $U = \sum\limits_{i=1}^N U_i + e$ and $R_n$, we need to get $U_n$.
+
+\subsection{Metrics}\label{subsec:metrics}
+\begin{itemize}
+    \item scale-invariant source-to-noise ratio (SI-SNR)
+
+    SI-SNR is proposed in~\cite{tasnet}.
+    \begin{equation}
+        \begin{aligned}
+            s_{\text{target}} &= \frac{\left< \hat{s}, s \right>s}{\| s \|^2} \\
+            s_{\text{noise}} &= \hat{s} - s_{\text{target}} \\
+            \text{SI-SNR} &\coloneqq 10\log_{10}\frac{\| s_{\text{target}} \|^2}{\| e_{\text{noise}} \|^2}
+        \end{aligned}\label{eq:si-snr}
+    \end{equation}
+\end{itemize}
+
+\subsection{Common Methods}\label{subsec:common-methods}

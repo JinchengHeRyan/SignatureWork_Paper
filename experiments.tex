@@ -42,29 +42,29 @@ A target pitch extraction examples selected from the test set is shown in Figure
 \end{figure}
 
 \begin{table*}[!htbp]
-    \small
     \centering
-    \begin{tabular}{l|c|c|c|c}
-        \toprule
-        & \multicolumn{4}{c}{Mean SDR} \\
-        Model (strategy)                             & \#PARAM TSS(TPE) & Before & After         & Improvement   \\
-        \midrule
-        MBRNN (Baseline)                             & 0.60M            & 1.26   & 6.09          & 4.83          \\
-        MBRNN Pitch (Concatenation)                  & 0.60M(1.46M)     & 1.26   & 6.28          & 5.02          \\
-        MBRNN Pitch (Joint train)                    & 0.60M(1.46M)     & 1.26   & \textbf{7.11} & \textbf{5.85} \\
-        MBRNN Pitch (Ground truth pitch)             & 0.60M            & 1.26   & 9.80          & 8.54          \\
-        \midrule
-        Our implementation of VoiceFilter (Baseline) & 15.52M           & 1.26   & 9.02          & 7.76          \\
-        Our implementation of VoiceFilter Pitch (Joint train) & 15.53M(1.46M) & 1.26 & \textbf{9.20}
-        & \textbf{7.94}
-        \\
-        \midrule
-        VoiceFilter~\cite{voicefilter} (Baseline)    & 9.45M            & 1.26   & 9.04          & 7.78          \\
-        VoiceFilter~\cite{voicefilter} Pitch (Joint train) & 9.46M(1.46M) & 1.26 & \textbf{9.60}
-        & \textbf{8.34}
-        \\
-        \bottomrule
-    \end{tabular}
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{l|c|c|c|c}
+            \toprule
+            & \multicolumn{4}{c}{Mean SDR} \\
+            Model (strategy)                             & \#PARAM TSS(TPE) & Before & After         & Improvement   \\
+            \midrule
+            MBRNN (Baseline)                             & 0.60M            & 1.26   & 6.09          & 4.83          \\
+            MBRNN Pitch (Concatenation)                  & 0.60M(1.46M)     & 1.26   & 6.28          & 5.02          \\
+            MBRNN Pitch (Joint train)                    & 0.60M(1.46M)     & 1.26   & \textbf{7.11} & \textbf{5.85} \\
+            MBRNN Pitch (Ground truth pitch)             & 0.60M            & 1.26   & 9.80          & 8.54          \\
+            \midrule
+            Our implementation of VoiceFilter (Baseline) & 15.52M           & 1.26   & 9.02          & 7.76          \\
+            Our implementation of VoiceFilter Pitch (Joint train) & 15.53M(1.46M) & 1.26 & \textbf{9.20}
+            & \textbf{7.94}
+            \\
+            \midrule
+            VoiceFilter~\cite{voicefilter} (Baseline)    & 9.45M            & 1.26   & 9.04          & 7.78          \\
+            VoiceFilter~\cite{voicefilter} Pitch (Joint train) & 9.46M(1.46M) & 1.26 & \textbf{9.60}
+            & \textbf{8.34}
+            \\
+            \bottomrule
+        \end{tabular}}
     \caption{Results comparison between different training strategies and the baseline with MBRNN and VoiceFilter model. ``Before" means the SDR value of the mixed utterance, ``After" means the SDR value of the estimated speech.}
     \label{tab:mbrnn_comparison}
 \end{table*}

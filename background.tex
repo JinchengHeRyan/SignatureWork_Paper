@@ -18,9 +18,17 @@ The task is given $U = \sum\limits_{i=1}^N U_i + e$ and $R_n$, we need to get $U
 
 \subsection{Metrics}\label{subsec:metrics}
 \begin{itemize}
+    \item source-to-distortion ratio (SDR)
+
+    SDR is defined in~\cite{performance_measurement}, and is as equation~\ref{eq:sdr}.
+    \begin{equation}
+        \text{SDR} \coloneqq 10\log_{10}\frac{\| s_{\text{target}} \|^2}{\| e_{\text{interf}} + e_{\text{noise}} + e_{\text{artif}} \|^2}
+        \label{eq:sdr}
+    \end{equation}
+
     \item scale-invariant source-to-noise ratio (SI-SNR)
 
-    SI-SNR is proposed in~\cite{tasnet}.
+    SI-SNR is proposed in~\cite{tasnet}, and is as equation~\ref{eq:si-snr}.
     \begin{equation}
         \begin{aligned}
             s_{\text{target}} &= \frac{\left< \hat{s}, s \right>s}{\| s \|^2} \\

@@ -8,15 +8,19 @@ In this section, we give a detailed background about what is target speaker sepa
 
 \subsection{What is TSS task}\label{subsec:what-is-tss-task}
 
-Assume there are $N$ speakers talking simultaneously, they are called $s_1, s_2, \dots s_N$. The speech utterance for each speaker is $U_i$ while $i\in\left[ 1, N \right]$. Assume the noise is $e$.
-So the mixed utterance $U$ is as equation~\ref{eq:mixed}.
+Assume there are $N$ speakers talking simultaneously, they are called $s_1, s_2, \dots s_N$. The waveform of speech utterance for each speaker is $U_i\left( t \right)$ while $i\in\left[ 1, N \right]$. Assume the noise is $e\left( t \right)$.
+So the mixed utterance $X\left( t \right)$ is as equation~\ref{eq:mixed}.
 \begin{equation}
-    U = \sum\limits_{i=1}^N U_i + e\label{eq:mixed}
+    X\left( t \right) = \sum\limits_{i=1}^N U_i\left( t \right) + e\left( t \right)
+    \label{eq:mixed}
 \end{equation}
-For the mission of Target Speaker Separation (TSS) Task. Assume we only need to extract the voice of speaker $s_n$ and we have the reference utterance from $s_n$, denoted as $R_n$.
-The task is given $U = \sum\limits_{i=1}^N U_i + e$ and $R_n$, we need to get $U_n$.
+For the mission of Target Speaker Separation (TSS) Task. Assume we only need to extract the voice of speaker $s_n$ from $X\left( t \right)$ and we have the reference utterance from $s_n$, denoted as $R_n$.
+The task is given $X\left( t \right) = \sum\limits_{i=1}^N U_i\left( t \right) + e\left( t \right)$ and $R_n$, we need to get $U_n\left( t \right)$.
 
 \subsection{Metrics}\label{subsec:metrics}
+
+Using meaningful metrics to define the performance of the separation system is important.
+
 \begin{itemize}
     \item source-to-distortion ratio (SDR)
 
@@ -32,10 +36,10 @@ The task is given $U = \sum\limits_{i=1}^N U_i + e$ and $R_n$, we need to get $U
     \begin{equation}
         \begin{aligned}
             s_{\text{target}} &= \frac{\left< \hat{s}, s \right>s}{\| s \|^2} \\
-            s_{\text{noise}} &= \hat{s} - s_{\text{target}} \\
+            e_{\text{noise}} &= \hat{s} - s_{\text{target}} \\
             \text{SI-SNR} &\coloneqq 10\log_{10}\frac{\| s_{\text{target}} \|^2}{\| e_{\text{noise}} \|^2}
         \end{aligned}\label{eq:si-snr}
     \end{equation}
 \end{itemize}
 
-\subsection{Common Methods}\label{subsec:common-methods}
+\subsection{Methodology}\label{subsec:methodology}

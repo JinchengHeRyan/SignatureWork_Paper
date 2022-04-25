@@ -101,18 +101,35 @@ To better solve the issue of tracking the speaking person, one utterance-level a
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{img/PIT_structure}
-    \caption{Permutation invariant training structure}
+    \caption{Permutation invariant training structure~\cite{PIT}}
     \label{fig:PIT_structure}
 \end{figure}
 
 To better solve the disadvantages of deep clustering, a new deep embedding clustering based algorithm DEF-DL~\cite{DEF-DL} is proposed.
-DEF-DL uses supervised network to replace of K-means clustering algorithm, and use this feature as the input of uPIT network to separate speech.
+DEF-DL uses supervised network to replace K-means clustering algorithm, and use this feature as the input of uPIT network to separate speech.
 The whole structure is as figure~\ref{fig:def_dl_structure}.
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{img/DEF-DL_structure}
-    \caption{DEF-DL structure}
+    \caption{DEF-DL structure~\cite{DEF-DL}}
     \label{fig:def_dl_structure}
 \end{figure}
+For the target speaker separation, one classic structure is speaker encoder, speech encoder, separator, decoder framework, as shown in figure~\ref{fig:enc_sep_doc_arc}.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/voicefilter_struct}
+    \caption{VoiceFilter structure~\cite{voicefilter}}
+    \label{fig:voicefilter_struct}
+\end{figure}
+
+One example is VoiceFilter~\cite{voicefilter}, the structure is shown in figure~\ref{fig:voicefilter_struct}.
+The speaker encoder is trained separately to get the speaker embedding.
+For each iteration of training, the noisy audio, clean audio and reference audio are given.
+Operating Short-time Fourier transform (STFT) to both noisy audio and clean audio to get the magnitude spectrogram and phase spectrogram.
+The magnitude spectrogram of the noisy audio is fed into the separator, for VoiceFilter, it is Convolutional Neural Network (CNN), Long short-term memory (LSTM)~\cite{LSTM} and fully-connected layer.
+After the separator predicting the mask, dot multiplication is applied to the input magnitude spectrogram to get the predicted masked magnitude spectrogram.
+Last, applying inverse STFT to the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio.
+The training loss of the network is mean squared error (MSE) between the masked magnitude spectrogram and the clean spectrogram from the clean audio.
 
 \subsubsection{Time-domain methods}

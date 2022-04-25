@@ -4,7 +4,7 @@
 
 \section{Background}\label{sec:background}
 
-In this section, we give a detailed background about what is target speaker separation (TSS) task, what kinds of metrics can be used to define the performance, what kinds of techniques existed can be used to do TSS task.
+In this section, we give a detailed background about what is target speaker separation (TSS) task, what kinds of metrics can be used to define the performance and what kinds of techniques existed can be used to do TSS task.
 
 \subsection{What is TSS task}\label{subsec:what-is-tss-task}
 
@@ -18,18 +18,18 @@ One waveform example is as figure~\ref{fig:waveform}.
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{img/waveform}
-    \caption{One example of how waveform looks like}
+    \caption{One example of how the waveform looks like}
     \label{fig:waveform}
 \end{figure}
 
-For the mission of Target Speaker Separation (TSS) Task. Assume we only need to extract the voice of speaker $s_n$ from $X\left( t \right)$ and we have the reference utterance from $s_n$, denoted as $R_n$.
+For the mission of the Target Speaker Separation (TSS) Task. Assume we only need to extract the voice of speaker $s_n$ from $X\left( t \right)$ and we have the reference utterance from $s_n$, denoted as $R_n$.
 The task is given $X\left( t \right) = \sum\limits_{i=1}^N U_i\left( t \right) + e\left( t \right)$ and $R_n$, we need to get $U_n\left( t \right)$.
 
 \subsection{Metrics}\label{subsec:metrics}
 
 Using meaningful metrics to define the performance of the separation system is important.
-To evaluate the performance of separation system, the metric should be designed to objectively represent ``how good'' the extracted waveform is.
-The idea of projecting one high dimensional vector onto another high dimensional vector comes in mind.
+To evaluate the performance of the separation system, the metric should be designed to objectively represent ``how good'' the extracted waveform is.
+The idea of projecting one high dimensional vector onto another high dimensional vector comes to mind.
 
 \begin{itemize}
     \item source-to-distortion ratio (SDR)
@@ -54,12 +54,12 @@ The idea of projecting one high dimensional vector onto another high dimensional
 
 \subsection{Methodology}\label{subsec:methodology}
 
-To extract target speaker's voice from the mixed utterance, we first need to extract the information of the target speaker.
-One common way is to use a vector to represent target speaker's information, and we call it the speaker embedding.
+To extract the target speaker's voice from the mixed utterance, we first need to extract the information of the target speaker.
+One common way is to use a vector to represent the target speaker's information, and we call it the speaker embedding.
 There are many ways and many different speaker embeddings, such as i-vector based on simple factor analysis in~\cite{i-vector}, a speaker embedding based on end-to-end neural network in~\cite{deep_speaker}, x-vector in~\cite{x-vector}, d-vector in~\cite{d-vector}.
 As Transformer architecture~\cite{attention} being existed, there are some Transformer encoder based speaker embeddings happen, such as s-vector in~\cite{s-vector}.
 
-After extracting the speaker embedding, there are basically two different ways to do the separation task, one is frequency-domain methods, another is time-domain methods.
+After extracting the speaker embedding, there are basically two different ways to do the separation task, one is frequency-domain methods, and another is time-domain methods.
 
 \subsubsection{Frequency-domain methods}
 
@@ -76,8 +76,8 @@ For the frequency-domain methods, the central part is processing the magnitude s
 For each utterance, by doing Fourier transform, it can be converted into magnitude spectrogram and phase spectrogram.
 For the frequency-domain methods, the central part is to mask the magnitude spectrogram.
 In (a), it is the magnitude spectrogram of the mixed utterance which contains two speakers, and (b) is the magnitude spectrogram of the target speaker's utterance.
-The goal is by given (a) and the target speaker's reference audio, we want to get (b). (c) is our system's estimated magnitude spectrogram of target speaker's utterance, and it is very visually similar to (b).
-For the frequency-domain methods, the mask is estimated, and dot multiplied to the mixed magnitude spectrogram for getting the estimated one.
+The goal is by giving (a) and the target speaker's reference audio, we want to get (b). (c) is our system's estimated magnitude spectrogram of the target speaker's utterance, and it is very visually similar to (b).
+For the frequency-domain methods, the mask is estimated, and is dot-multiplied to the mixed magnitude spectrogram for getting the estimated one.
 The whole process can be described in figure~\ref{fig:sep_process}.
 \begin{figure}[!htbp]
     \centering
@@ -93,8 +93,8 @@ The estimated mask is binary, and the projection process is achieved by the deep
     \label{eq:deep_clustering}
 \end{equation}
 
-Also, permutation invariant training (PIT) in~\cite{PIT}, which is widely used in blind speaker separation.
-One big problem of speaker independent speech separation is the permutation of the output of the network.
+Also, permutation invariant training (PIT) in~\cite{PIT} is widely used in blind speaker separation.
+One big problem of speaker-independent speech separation is the permutation of the output of the network.
 PIT solves this problem, which outputs all the permutations and using the smallest mean squared error (MSE) as the optimization goal.
 PIT structure is as figure~\ref{fig:PIT_structure}.
 To better solve the issue of tracking the speaking person, one utterance-level algorithm uPIT in~\cite{uPIT} is proposed.
@@ -106,7 +106,7 @@ To better solve the issue of tracking the speaking person, one utterance-level a
 \end{figure}
 
 To better solve the disadvantages of deep clustering, a new deep embedding clustering based algorithm DEF-DL~\cite{DEF-DL} is proposed.
-DEF-DL uses supervised network to replace K-means clustering algorithm, and use this feature as the input of uPIT network to separate speech.
+DEF-DL uses a supervised network to replace K-means clustering algorithm, and uses this feature as the input of uPIT network to separate speech.
 The whole structure is as figure~\ref{fig:def_dl_structure}.
 \begin{figure}[!htbp]
     \centering
@@ -125,14 +125,14 @@ For the target speaker separation, one classic structure is speaker encoder, spe
 
 One example is VoiceFilter~\cite{voicefilter}, the structure is shown in figure~\ref{fig:voicefilter_struct}.
 The speaker encoder is trained separately to get the speaker embedding.
-For each iteration of training, the noisy audio, clean audio and reference audio are given.
+For each iteration of training, the noisy audio, clean audio, and reference audio are given.
 Operating Short-time Fourier transform (STFT) to both noisy audio and clean audio to get the magnitude spectrogram and phase spectrogram.
 The magnitude spectrogram of the noisy audio is fed into the separator, for VoiceFilter, it is Convolutional Neural Network (CNN), Long short-term memory (LSTM)~\cite{LSTM} and fully-connected layer.
-After the separator predicting the mask, dot multiplication is applied to the input magnitude spectrogram to get the predicted masked magnitude spectrogram.
+After the separator predicts the mask, dot multiplication is applied to the input magnitude spectrogram to get the predicted masked magnitude spectrogram.
 Last, applying inverse STFT (iSTFT) to the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio.
 The training loss of the network is mean squared error (MSE) between the masked magnitude spectrogram and the clean spectrogram from the clean audio, which is also very common in the frequency-domain methods.
 
-However by applying iSTFT on the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio may have the effect on the performance since the phase spectrogram is not processed.
+However, applying iSTFT on the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio may affect the performance since the phase spectrogram is not processed.
 There are some methods that can reconstruct phase information, such is WA-MISI in~\cite{WA-MISI} and Deep CASA in~\cite{Deep_CASA}.
 
 \subsubsection{Time-domain methods}
@@ -140,12 +140,12 @@ There are some methods that can reconstruct phase information, such is WA-MISI i
 To better solve the problem of the phase information is not matched to the masked spectrogram, many time-domain methods existed.
 For the time-domain methods, the input and output are not magnitude spectrogram anymore.
 These methods directly process the waveform and output the waveform.
-Since the waveform contains both magnitude and phase information, the issue of mis-matching phase can be solved.
+Since the waveform contains both magnitude and phase information, the issue of mismatching phase can be solved.
 There are some outstanding works of time-domain methods, such as Conv-TasNet~\cite{conv_tasnet}, which has three main modules: encoder, separator and decoder.
 For the encoder, it uses 1-dimensional convolutional layer to replace STFT to encode the waveform, which forces the network to learn the parameters.
 For the separator, it was fed the feature from the encoder and output the mask which is very similar to the frequency-domain methods.
 Dot multiplication is applied to the mask and the output feature from the encoder.
 Last but not least, the decoder which is a transpose 1-dimensional convolutional layer which takes the output from the separator to the audio signal.
-Conv-TasNet directly use Si-SNR~\ref{eq:si-snr} as the training loss, which can improve the performance and solve the issue of the mismatching phase information.
-However Conv-TasNet can only focus on the segmented length of the audio, it cannot focus to the whole utterance.
-A new system which is also a time-domain method called Dual-Path RNN (DPRNN) is proposed in~\cite{dprnn}, which can focus to the whole utterance and thus improve the performance.
+Conv-TasNet directly uses Si-SNR~\ref{eq:si-snr} as the training loss, which can improve the performance and solve the issue of the mismatching phase information.
+However Conv-TasNet can only focus on the segmented length of the audio, it cannot focus on the whole utterance.
+A new system which is also a time-domain method called Dual-Path RNN (DPRNN) is proposed in~\cite{dprnn}, which can focus on the whole utterance and thus improve the performance.

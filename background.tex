@@ -86,4 +86,22 @@ The whole process can be described in figure~\ref{fig:sep_process}.
     \label{fig:sep_process}
 \end{figure}
 
+There are many methods using this framework, such as deep clustering~\cite{deep_clustering}, which trains a deep network to produce spectrogram embeddings.
+The estimated mask is binary, and the projection process is achieved by the deep neural network, and the objective function it trains is as equation~\ref{eq:deep_clustering}.
+\begin{equation}
+    C_Y\left( V \right) = \| VV^T - YY^T \|_F^2
+    \label{eq:deep_clustering}
+\end{equation}
+
+Also, permutation invariant training (PIT) in~\cite{pitch_aware}, which is widely used in blind speaker separation.
+One big problem of speaker independent speech separation is the permutation of the output of the network.
+PIT solves this problem, which outputs all the permutations and using the smallest mean squared error (MSE) as the optimization goal.
+PIT structure is as figure~\ref{fig:PIT_structure}.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/PIT_structure}
+    \caption{Permutation invariant training structure}
+    \label{fig:PIT_structure}
+\end{figure}
+
 \subsubsection{Time-domain methods}

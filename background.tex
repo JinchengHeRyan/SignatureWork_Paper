@@ -105,4 +105,14 @@ To better solve the issue of tracking the speaking person, one utterance-level a
     \label{fig:PIT_structure}
 \end{figure}
 
+To better solve the disadvantages of deep clustering, a new deep embedding clustering based algorithm DEF-DL~\cite{DEF-DL} is proposed.
+DEF-DL uses supervised network to replace of K-means clustering algorithm, and use this feature as the input of uPIT network to separate speech.
+The whole structure is as figure~\ref{fig:def_dl_structure}.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/DEF-DL_structure}
+    \caption{DEF-DL structure}
+    \label{fig:def_dl_structure}
+\end{figure}
+
 \subsubsection{Time-domain methods}

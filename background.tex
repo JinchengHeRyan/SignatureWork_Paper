@@ -59,6 +59,18 @@ One common way is to use a vector to represent target speaker's information, and
 There are many ways and many different speaker embeddings, such as i-vector in~\cite{i-vector}, a speaker embedding based on end-to-end neural network in~\cite{deep_speaker}, x-vector in~\cite{x-vector}, d-vector in~\cite{d-vector}.
 As Transformer architecture~\cite{attention} being existed, there are some Transformer encoder based speaker embeddings happen, such as s-vector in~\cite{s-vector}.
 
+After extracting the speaker embedding, there are basically two different ways to do the separation task, one is frequency-domain methods, another is time-domain methods.
+
 \subsubsection{Frequency-domain methods}
+
+For the frequency-domain methods, the central part is processing the spectrogram. Here gives an example in figure~\ref{fig:spec_exp}.
+\begin{figure}
+    \centering
+    \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_mix}}{(a)}
+    \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_tar}}{(b)}
+    \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_est}}{(c)}
+    \caption{Spectrogram example of 1650-167613-0006. (a) Spectrogram of the mixed utterance; (b) Spectrogram of the target speaker utterance; (c) Spectrogram of the estimated target speaker utterance. }
+    \label{fig:spec_exp}
+\end{figure}
 
 \subsubsection{Time-domain methods}

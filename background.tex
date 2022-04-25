@@ -130,9 +130,20 @@ Operating Short-time Fourier transform (STFT) to both noisy audio and clean audi
 The magnitude spectrogram of the noisy audio is fed into the separator, for VoiceFilter, it is Convolutional Neural Network (CNN), Long short-term memory (LSTM)~\cite{LSTM} and fully-connected layer.
 After the separator predicting the mask, dot multiplication is applied to the input magnitude spectrogram to get the predicted masked magnitude spectrogram.
 Last, applying inverse STFT (iSTFT) to the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio.
-The training loss of the network is mean squared error (MSE) between the masked magnitude spectrogram and the clean spectrogram from the clean audio.
+The training loss of the network is mean squared error (MSE) between the masked magnitude spectrogram and the clean spectrogram from the clean audio, which is also very common in the frequency-domain methods.
 
 However by applying iSTFT on the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio may have the effect on the performance since the phase spectrogram is not processed.
 There are some methods that can reconstruct phase information, such is WA-MISI in~\cite{WA-MISI} and Deep CASA in~\cite{Deep_CASA}.
 
 \subsubsection{Time-domain methods}
+
+To better solve the problem of the phase information is not matched to the masked spectrogram, many time-domain methods existed.
+For the time-domain methods, the input and output are not magnitude spectrogram anymore.
+These methods directly process the waveform and output the waveform.
+Since the waveform contains both magnitude and phase information, the issue of mis-matching phase can be solved.
+There are some outstanding works of time-domain methods, such as Conv-TasNet~\cite{conv_tasnet}, which has three main modules: encoder, separator and decoder.
+For the encoder, it uses 1-dimensional convolutional layer to replace STFT to encode the waveform, which forces the network to learn the parameters.
+For the separator, it was fed the feature from the encoder and output the mask which is very similar to the frequency-domain methods.
+Dot multiplication is applied to the mask and the output feature from the encoder.
+Last but not least, the decoder which is a transpose 1-dimensional convolutional layer which takes the output from the separator to the audio signal.
+Conv-TasNet directly use Si-SNR~\ref{eq:si-snr} as the training loss, which can improve the performance and solve the issue of the mismatching phase information.

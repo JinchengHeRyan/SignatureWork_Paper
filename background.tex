@@ -147,3 +147,5 @@ For the separator, it was fed the feature from the encoder and output the mask w
 Dot multiplication is applied to the mask and the output feature from the encoder.
 Last but not least, the decoder which is a transpose 1-dimensional convolutional layer which takes the output from the separator to the audio signal.
 Conv-TasNet directly use Si-SNR~\ref{eq:si-snr} as the training loss, which can improve the performance and solve the issue of the mismatching phase information.
+However Conv-TasNet can only focus on the segmented length of the audio, it cannot focus to the whole utterance.
+A new system which is also a time-domain method called Dual-Path RNN (DPRNN) is proposed in~\cite{dprnn}, which can focus to the whole utterance and thus improve the performance.

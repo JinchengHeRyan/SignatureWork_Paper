@@ -129,7 +129,10 @@ For each iteration of training, the noisy audio, clean audio and reference audio
 Operating Short-time Fourier transform (STFT) to both noisy audio and clean audio to get the magnitude spectrogram and phase spectrogram.
 The magnitude spectrogram of the noisy audio is fed into the separator, for VoiceFilter, it is Convolutional Neural Network (CNN), Long short-term memory (LSTM)~\cite{LSTM} and fully-connected layer.
 After the separator predicting the mask, dot multiplication is applied to the input magnitude spectrogram to get the predicted masked magnitude spectrogram.
-Last, applying inverse STFT to the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio.
+Last, applying inverse STFT (iSTFT) to the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio.
 The training loss of the network is mean squared error (MSE) between the masked magnitude spectrogram and the clean spectrogram from the clean audio.
+
+However by applying iSTFT on the masked magnitude spectrogram and the original phase spectrogram to get the enhanced audio may have the effect on the performance since the phase spectrogram is not processed.
+There are some methods that can reconstruct phase information, such is WA-MISI in~\cite{WA-MISI} and Deep CASA in~\cite{Deep_CASA}.
 
 \subsubsection{Time-domain methods}

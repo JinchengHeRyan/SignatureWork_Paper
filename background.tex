@@ -56,21 +56,34 @@ The idea of projecting one high dimensional vector onto another high dimensional
 
 To extract target speaker's voice from the mixed utterance, we first need to extract the information of the target speaker.
 One common way is to use a vector to represent target speaker's information, and we call it the speaker embedding.
-There are many ways and many different speaker embeddings, such as i-vector in~\cite{i-vector}, a speaker embedding based on end-to-end neural network in~\cite{deep_speaker}, x-vector in~\cite{x-vector}, d-vector in~\cite{d-vector}.
+There are many ways and many different speaker embeddings, such as i-vector based on simple factor analysis in~\cite{i-vector}, a speaker embedding based on end-to-end neural network in~\cite{deep_speaker}, x-vector in~\cite{x-vector}, d-vector in~\cite{d-vector}.
 As Transformer architecture~\cite{attention} being existed, there are some Transformer encoder based speaker embeddings happen, such as s-vector in~\cite{s-vector}.
 
 After extracting the speaker embedding, there are basically two different ways to do the separation task, one is frequency-domain methods, another is time-domain methods.
 
 \subsubsection{Frequency-domain methods}
 
-For the frequency-domain methods, the central part is processing the spectrogram. Here gives an example in figure~\ref{fig:spec_exp}.
+For the frequency-domain methods, the central part is processing the magnitude spectrogram. Here gives an example in figure~\ref{fig:spec_exp}.
 \begin{figure}
     \centering
     \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_mix}}{(a)}
     \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_tar}}{(b)}
     \stackunder[5pt]{\includegraphics[width=0.9\linewidth]{img/spec_exp_est}}{(c)}
-    \caption{Spectrogram example of 1650-167613-0006. (a) Spectrogram of the mixed utterance; (b) Spectrogram of the target speaker utterance; (c) Spectrogram of the estimated target speaker utterance. }
+    \caption{Magnitude spectrogram example of 1650-167613-0006. (a) Magnitude spectrogram of the mixed utterance; (b) Magnitude spectrogram of the target speaker utterance; (c) Magnitude spectrogram of the estimated target speaker utterance. }
     \label{fig:spec_exp}
+\end{figure}
+
+For each utterance, by doing Fourier transform, it can be converted into magnitude spectrogram and phase spectrogram.
+For the frequency-domain methods, the central part is to mask the magnitude spectrogram.
+In (a), it is the magnitude spectrogram of the mixed utterance which contains two speakers, and (b) is the magnitude spectrogram of the target speaker's utterance.
+The goal is by given (a) and the target speaker's reference audio, we want to get (b). (c) is our system's estimated magnitude spectrogram of target speaker's utterance, and it is very visually similar to (b).
+For the frequency-domain methods, the mask is estimated, and dot multiplied to the mixed magnitude spectrogram for getting the estimated one.
+The whole process can be described in figure~\ref{fig:sep_process}.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/sep_process}
+    \caption{Frequency-domain methods general description}
+    \label{fig:sep_process}
 \end{figure}
 
 \subsubsection{Time-domain methods}

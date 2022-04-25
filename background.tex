@@ -93,10 +93,11 @@ The estimated mask is binary, and the projection process is achieved by the deep
     \label{eq:deep_clustering}
 \end{equation}
 
-Also, permutation invariant training (PIT) in~\cite{pitch_aware}, which is widely used in blind speaker separation.
+Also, permutation invariant training (PIT) in~\cite{PIT}, which is widely used in blind speaker separation.
 One big problem of speaker independent speech separation is the permutation of the output of the network.
 PIT solves this problem, which outputs all the permutations and using the smallest mean squared error (MSE) as the optimization goal.
 PIT structure is as figure~\ref{fig:PIT_structure}.
+To better solve the issue of tracking the speaking person, one utterance-level algorithm uPIT in~\cite{uPIT} is proposed.
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{img/PIT_structure}
